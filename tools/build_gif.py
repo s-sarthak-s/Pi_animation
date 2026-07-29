@@ -111,38 +111,30 @@ def to_pixels(grid):
     return bytes(out), W * SCALE, H * SCALE
 
 
-# ── minimal GIF89a + LZW encoder ─────────────────────────────────────────────
-def lzw_encode(indices, min_code_size):
-    clear, end = 1 << min_code_size, (1 << min_code_size) + 1
-    code_size = min_code_size + 1
-    table = {bytes([i]): i for i in range(1 << min_code_size)}
-    next_code = end + 1
+# ── GIF89a encoder ───────────────────────────────────────────────────────────
+# Uncompressed variant: fixed code width + periodic CLEAR codes. No code-size
+# growth means no off-by-one bump to get wrong — always decodes correctly.
+def lzw_encode(indices, mcs):
+    clear, end = 1 << mcs, (1 << mcs) + 1
+    size = mcs + 1
     out, cur, nbits = bytearray(), 0, 0
 
     def emit(code):
         nonlocal cur, nbits
         cur |= code << nbits
-        nbits += code_size
+        nbits += size
         while nbits >= 8:
             out.append(cur & 0xFF); cur >>= 8; nbits -= 8
 
     emit(clear)
-    w = bytes([indices[0]])
-    for k in indices[1:]:
-        wk = w + bytes([k])
-        if wk in table:
-            w = wk
-        else:
-            emit(table[w])
-            table[wk] = next_code; next_code += 1
-            if next_code == (1 << code_size) and code_size < 12:
-                code_size += 1
-            if next_code > 4095:
-                emit(clear)
-                table = {bytes([i]): i for i in range(1 << min_code_size)}
-                next_code = end + 1; code_size = min_code_size + 1
-            w = bytes([k])
-    emit(table[w]); emit(end)
+    reset_after = (1 << size) - clear - 2  # reset table before the width would grow
+    count = 0
+    for v in indices:
+        emit(v)
+        count += 1
+        if count >= reset_after:
+            emit(clear); count = 0
+    emit(end)
     if nbits > 0:
         out.append(cur & 0xFF)
     return bytes(out)
