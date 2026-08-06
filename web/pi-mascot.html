@@ -82,27 +82,73 @@
           <circle cx="130" cy="26" r="4" fill="#00eaff" />
           <circle cx="142" cy="16" r="5" fill="#00eaff" />
         </g>
+
+        <!-- floating z's for 'sleepy' -->
+        <g id="zzz" opacity="0" font-family="ui-monospace, monospace" font-weight="bold">
+          <text x="118" y="36" font-size="10" fill="#8a7fb0">z</text>
+          <text x="129" y="25" font-size="13" fill="#9d90c4">z</text>
+          <text x="141" y="12" font-size="16" fill="#b3a6dd">z</text>
+        </g>
       </g>
     </svg>
   </div>
 
   <div class="label" id="label">idle</div>
-  <div class="hint">a new animation plays each loop — press space to shuffle</div>
-  <button class="btn" id="shuffle">shuffle ↻</button>
+  <div class="hint">a new animation plays each loop — every window gets a random color</div>
+  <div>
+    <button class="btn" id="shuffle">shuffle ↻</button>
+    <button class="btn" id="recolor">recolor 🎨</button>
+    <button class="btn" id="dance">dance 💃</button>
+    <button class="btn" id="crazy">crazy 🤪</button>
+  </div>
 
 <script>
 const $ = (id) => document.getElementById(id);
 const mascot = $("mascot"), body = $("body"), face = $("face");
 const armL = $("armL"), armR = $("armR"), legL = $("legL"), legR = $("legR");
 const eyeL = $("eyeL"), eyeR = $("eyeR"), pupL = $("pupL"), pupR = $("pupR");
-const mouth = $("mouth"), pie = $("pie"), think = $("think"), shadow = $("shadow");
+const mouth = $("mouth"), pie = $("pie"), think = $("think"), zzz = $("zzz"), shadow = $("shadow");
 const label = $("label");
+
+// ── palettes: every window load picks one at random ─────────────────────────
+const PALETTES = [
+  ["blue",    "#2e7fff", "#1f6fff"],
+  ["cyan",    "#00d6eb", "#0097b8"],
+  ["pink",    "#ff41b1", "#cc2689"],
+  ["purple",  "#ae60ff", "#7d3ed6"],
+  ["green",   "#2bdc80", "#189d57"],
+  ["orange",  "#ff9134", "#d25b1c"],
+  ["red",     "#ff4c5b", "#c72b3a"],
+  ["gold",    "#ffc936", "#d29119"],
+  ["mint",    "#34d399", "#25986e"],
+  ["coral",   "#ff6f61", "#d65045"],
+  ["sky",     "#38bdf8", "#1d86c4"],
+  ["lime",    "#a3e635", "#76ab22"],
+  ["magenta", "#e850dc", "#aa37a0"],
+  ["indigo",  "#6366f1", "#4949ad"],
+  ["rose",    "#fb7185", "#b55160"],
+  ["ice",     "#b4dcff", "#82a0be"],
+];
+let paletteIndex = Math.floor(Math.random() * PALETTES.length);
+function applyPalette() {
+  const [, light, dark] = PALETTES[paletteIndex];
+  $("bar").setAttribute("fill", light);
+  for (const el of [armL, armR, legL, legR, $("foot")]) el.setAttribute("fill", dark);
+}
+function recolor() {
+  let i;
+  do { i = Math.floor(Math.random() * PALETTES.length); } while (i === paletteIndex && PALETTES.length > 1);
+  paletteIndex = i;
+  applyPalette();
+}
+const routineLabel = (name) => (name === "pieTime" ? "pie time" : name) + " · " + PALETTES[paletteIndex][0];
 
 // reset everything to neutral pose before each routine
 function reset() {
   gsap.set([mascot, body, face, armL, armR, legL, legR, eyeL, eyeR, pupL, pupR, mouth], { clearProps: "all" });
   gsap.set(pie, { opacity: 0 });
   gsap.set(think, { opacity: 0 });
+  gsap.set(zzz, { opacity: 0 });
   gsap.set([legL, legR], { transformOrigin: "50% 0%" });
   gsap.set([armL, armR], { transformOrigin: "50% 0%" });
 }
@@ -175,6 +221,63 @@ const routines = {
       .to(mouth, { scaleX: 1, y: 0, duration:.2 }, "<");
     return tl;
   },
+  spin() {
+    const tl = gsap.timeline();
+    tl.to([armL, armR], { rotation: (i) => i ? -60 : 60, transformOrigin: "50% 0%", duration: .25 }, 0)
+      .to(mascot, { rotation: 360, transformOrigin: "50% 60%", duration: .7, ease: "power1.inOut" }, 0)
+      .to([armL, armR], { rotation: 0, duration: .25 }, .55);
+    blink(tl, .8);
+    return tl;
+  },
+  cheer() {
+    const tl = gsap.timeline();
+    tl.to(mouth, { scaleX: 1.5, scaleY: 1.9, transformOrigin: "50% 50%", duration: .2 }, 0)
+      .to([armL, armR], { rotation: (i) => i ? -140 : 140, transformOrigin: "50% 0%", duration: .25, ease: "back.out(2)" }, 0)
+      .to(mascot, { y: -18, duration: .16, yoyo: true, repeat: 3, ease: "sine.inOut" })
+      .to([armL, armR], { rotation: 0, duration: .3 })
+      .to(mouth, { scaleX: 1, scaleY: 1, duration: .2 }, "<");
+    return tl;
+  },
+  sleepy() {
+    const tl = gsap.timeline();
+    tl.to([eyeL, eyeR], { scaleY: 0.12, transformOrigin: "50% 50%", duration: .4 })
+      .to(mascot, { rotation: 3, transformOrigin: "50% 100%", duration: .9, yoyo: true, repeat: 1, ease: "sine.inOut" }, 0)
+      .to(zzz, { opacity: 1, duration: .2 }, .3)
+      .from(zzz.children, { opacity: 0, y: 6, stagger: .3, duration: .4 }, .3)
+      .to({}, { duration: .5 })
+      .to(zzz, { opacity: 0, duration: .2 })
+      .to([eyeL, eyeR], { scaleY: 1, duration: .3 }, "<");
+    return tl;
+  },
+  peek() {
+    const tl = gsap.timeline();
+    tl.to(mascot, { y: 55, scaleY: .55, transformOrigin: "50% 100%", duration: .35, ease: "power2.in" })
+      .to([pupL, pupR], { x: -4, duration: .2 })
+      .to([pupL, pupR], { x: 4, duration: .3 })
+      .to(mascot, { y: 0, scaleY: 1, duration: .45, ease: "back.out(2.5)" })
+      .to([pupL, pupR], { x: 0, duration: .2 }, "<");
+    return tl;
+  },
+  wiggle() {
+    const tl = gsap.timeline();
+    tl.to(mascot, { rotation: -6, transformOrigin: "50% 100%", duration: .12, ease: "sine.inOut" })
+      .to(mascot, { rotation: 6, duration: .16, yoyo: true, repeat: 5, ease: "sine.inOut" })
+      .to(mascot, { rotation: 0, duration: .12 });
+    blink(tl, .3);
+    return tl;
+  },
+  levitate() {
+    const tl = gsap.timeline();
+    tl.to(mascot, { y: -30, duration: .8, ease: "sine.inOut" })
+      .to(shadow, { scaleX: .6, opacity: .18, transformOrigin: "50% 50%", duration: .8 }, 0)
+      .to([armL, armR], { rotation: (i) => i ? -25 : 25, transformOrigin: "50% 0%", duration: .8 }, 0)
+      .to(mascot, { y: -22, duration: .5, yoyo: true, repeat: 1, ease: "sine.inOut" })
+      .to(mascot, { y: 0, duration: .6, ease: "sine.inOut" })
+      .to(shadow, { scaleX: 1, opacity: .35, duration: .6 }, "<")
+      .to([armL, armR], { rotation: 0, duration: .6 }, "<");
+    blink(tl, 1.2);
+    return tl;
+  },
   pieTime() {
     const tl = gsap.timeline();
     tl.to(armR, { rotation: -60, transformOrigin:"50% 0%", duration:.3, ease:"power2.out" })
@@ -191,23 +294,56 @@ const routines = {
 
 const names = Object.keys(routines);
 let last = "";
+let mode = "shuffle";          // "shuffle" | "dance" | "crazy"
+let marathonIndex = 0;
+let crazyColorTimer = null;
 
-function playRandom() {
+function stopCrazyColors() {
+  if (crazyColorTimer) { clearInterval(crazyColorTimer); crazyColorTimer = null; }
+}
+
+function setMode(next) {
+  mode = next;
+  marathonIndex = 0;
+  stopCrazyColors();
+  if (mode === "crazy") crazyColorTimer = setInterval(recolor, 280);
+  gsap.globalTimeline.getChildren().forEach(t => t.kill());
+  playNext();
+}
+
+function playNext() {
   reset();
   // continuous idle bob + breathing under everything
   gsap.to(shadow, { scaleX: 0.9, transformOrigin:"50% 50%", duration: 1, yoyo:true, repeat:1 });
   let name;
-  do { name = names[Math.floor(Math.random() * names.length)]; } while (name === last && names.length > 1);
+  if (mode === "shuffle") {
+    do { name = names[Math.floor(Math.random() * names.length)]; } while (name === last && names.length > 1);
+  } else {
+    if (marathonIndex >= names.length) {          // one full pass done
+      const wasCrazy = mode === "crazy";
+      mode = "shuffle";
+      stopCrazyColors();
+      label.textContent = (wasCrazy ? "crazy over 😵" : "encore! ✨") + " · " + PALETTES[paletteIndex][0];
+      gsap.delayedCall(1.2, playNext);
+      return;
+    }
+    name = names[marathonIndex++];
+  }
   last = name;
-  label.textContent = name === "pieTime" ? "pie time" : name;
+  label.textContent = routineLabel(name) + (mode !== "shuffle" ? `  (${marathonIndex}/${names.length})` : "");
   const tl = routines[name]();
-  tl.eventCallback("onComplete", () => gsap.delayedCall(0.35, playRandom));
+  if (mode === "crazy") tl.timeScale(2);
+  tl.eventCallback("onComplete", () => gsap.delayedCall(mode === "crazy" ? 0.08 : mode === "dance" ? 0.2 : 0.35, playNext));
 }
 
-document.addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); gsap.globalTimeline.getChildren().forEach(t=>t.kill()); playRandom(); } });
-$("shuffle").addEventListener("click", () => { playRandom(); });
+document.addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); setMode("shuffle"); } });
+$("shuffle").addEventListener("click", () => { setMode("shuffle"); });
+$("recolor").addEventListener("click", () => { recolor(); label.textContent = routineLabel(last || "idle"); });
+$("dance").addEventListener("click", () => { setMode("dance"); });
+$("crazy").addEventListener("click", () => { setMode("crazy"); });
 
-playRandom();
+applyPalette();
+playNext();
 </script>
 </body>
 </html>
