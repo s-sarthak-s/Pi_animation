@@ -84,7 +84,8 @@ const blank = (): string[][] => Array.from({ length: H }, () => Array(W).fill(".
 const set = (g: string[][], x: number, y: number, ch: string) => { if (y >= 0 && y < H && x >= 0 && x < W) g[y][x] = ch; };
 
 type Prop = "keyboard" | "coffee" | "book" | "rocket" | "wand" | "guitar" | "umbrella" | "heart" | "search" | "paint"
-  | "balloon" | "yoyo" | "mic" | "camera" | "fishing" | "skate";
+  | "balloon" | "yoyo" | "mic" | "camera" | "fishing" | "skate"
+  | "drums" | "sax" | "violin" | "racket" | "paddle" | "campfire" | "flower";
 interface Pose {
   look?: number; blink?: boolean; smile?: boolean; armR?: "down" | "up" | "mid"; armL?: "down" | "up";
   think?: boolean; ox?: number; oy?: number; ball?: number; step?: number; flag?: number; confetti?: number;
@@ -173,7 +174,7 @@ function frame(p: Pose = {}, color: MascotColor): string[] {
     for (const [x, y, ch] of sets as [number, number, string][]) s(x, y, ch);
   }
 
-  // Sixteen tiny props power twenty-two additional routines without changing canvas size.
+  // Twenty-three tiny props power the extra routines without changing canvas size.
   if (p.prop === "keyboard") {
     b(3, 10, 6, 7, "W"); for (let x = 4 + (phase % 2); x <= 9; x += 2) b(x, x, 6, 6, "C");
   } else if (p.prop === "coffee") {
@@ -216,12 +217,35 @@ function frame(p: Pose = {}, color: MascotColor): string[] {
   } else if (p.prop === "skate") {
     b(3, 10, 9, 9, "V");
     s(phase % 2 ? 0 : 1, 6, "C"); s(phase % 2 ? 1 : 0, 8, "C");
+  } else if (p.prop === "drums") {
+    b(3, 5, 6, 7, "O"); b(8, 10, 6, 7, "O");
+    s(6, 5, "Y"); s(7, 5, "Y");
+    s(phase % 2 ? 8 : 4, 4, "W");
+  } else if (p.prop === "sax") {
+    s(9, 4, "Y"); s(10, 5, "Y"); s(10, 6, "Y"); b(9, 11, 7, 7, "Y"); s(9, 5, "W");
+  } else if (p.prop === "violin") {
+    b(10, 13, 3, 3, "O"); s(11, 4, "O"); s(13, 2, "W");
+    const bx = 8 + (phase % 2); b(bx, bx, 0, 2, "W");
+  } else if (p.prop === "racket") {
+    b(11, 13, 1, 2, "G"); b(12, 12, 3, 4, "W");
+  } else if (p.prop === "paddle") {
+    b(2, 11, 5, 5, "W");
+    if (phase % 2) { b(1, 2, 4, 5, "O"); b(11, 12, 5, 7, "O"); }
+    else { b(1, 2, 5, 7, "O"); b(11, 12, 4, 5, "O"); }
+  } else if (p.prop === "campfire") {
+    b(4, 9, 9, 9, "W"); b(5, 8, 8, 8, "O");
+    if (phase % 2) { s(6, 7, "Y"); s(8, 7, "O"); }
+    else { s(5, 7, "O"); s(7, 7, "Y"); }
+  } else if (p.prop === "flower") {
+    b(11, 13, 8, 8, "O"); b(12, 12, 6, 7, "G"); s(11, 7, "G"); s(12, 5, "Y");
+    if (phase % 2) { s(11, 4, "N"); s(12, 3, "N"); s(13, 4, "N"); }
+    else { s(11, 5, "N"); s(13, 5, "N"); s(12, 4, "N"); }
   }
 
   return render(g.map((r) => r.join("")), color);
 }
 
-// Original twelve + fourteen prop routines + eight more = thirty-four total.
+// Original twelve + fourteen prop routines + eight more + thirty new = sixty-four total.
 const ROUTINES = {
   dance: [{ ox: -1, armL: "up", smile: true }, { smile: true }, { ox: 1, armR: "up", smile: true }, { smile: true }],
   dribble: [{ ball: 5, armR: "mid" }, { ball: 7, armR: "mid" }, { ball: 8, armR: "down" }, { ball: 7, armR: "mid" }],
@@ -257,6 +281,36 @@ const ROUTINES = {
   skate: [{ prop: "skate", phase: 0, ox: -1, step: 0 }, { prop: "skate", phase: 1, ox: 1, oy: -1, armL: "up", smile: true }, { prop: "skate", phase: 0, ox: 1, step: 1 }, { prop: "skate", phase: 1, ox: -1, oy: -1, armR: "up", smile: true }],
   balloon: [{ prop: "balloon", phase: 0, armR: "mid", look: 1 }, { prop: "balloon", phase: 1, armR: "mid", look: 1, smile: true }, { prop: "balloon", phase: 0, armR: "mid", oy: -1, armL: "up" }, { prop: "balloon", phase: 1, armR: "mid", blink: true }],
   yoyo: [{ prop: "yoyo", phase: 0, armR: "mid" }, { prop: "yoyo", phase: 1, armR: "mid", look: 1 }, { prop: "yoyo", phase: 2, armR: "mid" }, { prop: "yoyo", phase: 1, armR: "mid", blink: true }],
+  moonwalk: [{ step: 1, ox: 1, look: -1 }, { step: 0, oy: -1 }, { step: 1, ox: -1, look: -1 }, { step: 0, oy: -1, blink: true }],
+  robot: [{ armL: "up", armR: "down", look: -1 }, { armR: "mid", blink: true }, { armL: "up", armR: "up", look: 1 }, { armR: "mid", oy: -1 }],
+  salsa: [{ ox: -1, armL: "up", smile: true }, { ox: 1, armR: "up", oy: -1, smile: true }, { ox: -1, armR: "up", smile: true }, { ox: 1, armL: "up", oy: -1, smile: true }],
+  headbang: [{ prop: "guitar", phase: 0, oy: 1, armR: "mid" }, { prop: "guitar", phase: 1, oy: -1, armL: "up" }, { prop: "guitar", phase: 0, oy: 1, blink: true }, { prop: "guitar", phase: 1, oy: -1, armL: "up", smile: true }],
+  dj: [{ prop: "keyboard", phase: 0, armR: "up", notes: 0 }, { prop: "keyboard", phase: 1, armR: "mid", look: 1 }, { prop: "keyboard", phase: 0, armR: "up", notes: 2, smile: true }, { prop: "keyboard", phase: 1, armL: "up", look: -1 }],
+  ballet: [{ oy: -2, armL: "up", armR: "up", smile: true }, { oy: -1, armL: "up", armR: "up", look: 1 }, { oy: -2, armL: "up", armR: "up", look: -1 }, { blink: true, smile: true }],
+  hula: [{ ox: -1, armL: "up", armR: "mid", smile: true }, { armL: "up", armR: "up" }, { ox: 1, armL: "up", armR: "mid", smile: true }, { blink: true }],
+  disco: [{ armR: "up", ox: 1, confetti: 0, smile: true }, { armL: "up", ox: -1, confetti: 1 }, { armR: "up", ox: 1, confetti: 2, oy: -1, smile: true }, { armL: "up", ox: -1, confetti: 3 }],
+  drums: [{ prop: "drums", phase: 0, armL: "up" }, { prop: "drums", phase: 1, armR: "mid" }, { prop: "drums", phase: 0, armL: "up", blink: true }, { prop: "drums", phase: 1, oy: -1, armR: "mid", smile: true }],
+  sax: [{ prop: "sax", phase: 0, notes: 0, look: 1 }, { prop: "sax", phase: 1, notes: 1, oy: -1 }, { prop: "sax", phase: 0, notes: 2, blink: true }, { prop: "sax", phase: 1, notes: 1, smile: true }],
+  violin: [{ prop: "violin", phase: 0, armR: "mid", look: -1 }, { prop: "violin", phase: 1, armR: "up", look: 1 }, { prop: "violin", phase: 0, armR: "mid", notes: 0, blink: true }, { prop: "violin", phase: 1, armR: "mid", smile: true }],
+  conductor: [{ prop: "wand", phase: 0, armR: "up", armL: "up", look: -1 }, { prop: "wand", phase: 1, armR: "mid" }, { prop: "wand", phase: 0, armR: "up", look: 1, notes: 1 }, { prop: "wand", phase: 1, armR: "mid", blink: true }],
+  tennis: [{ prop: "racket", ball: 2, armR: "up", look: 1 }, { prop: "racket", ball: 5, oy: -1, armR: "up" }, { prop: "racket", ball: 7, armR: "mid", sweat: true, phase: 0 }, { prop: "racket", ball: 5, blink: true }],
+  dunk: [{ ball: 8, armR: "down" }, { ball: 5, oy: -1, armR: "mid" }, { ball: 2, oy: -3, armL: "up", armR: "up", smile: true }, { ball: 8, blink: true }],
+  soccer: [{ ball: 8, step: 0, look: 1 }, { ball: 7, step: 1, oy: -1, armR: "mid" }, { ball: 8, step: 0, sweat: true, phase: 1 }, { ball: 7, blink: true, smile: true }],
+  boxing: [{ armR: "mid", ox: -1, sweat: true, phase: 0 }, { armR: "up", ox: 1, look: 1 }, { armL: "up", ox: -1, sweat: true, phase: 1 }, { armR: "mid", ox: 1, blink: true }],
+  kayak: [{ prop: "paddle", phase: 0, sit: true, look: -1 }, { prop: "paddle", phase: 1, sit: true }, { prop: "paddle", phase: 0, sit: true, blink: true }, { prop: "paddle", phase: 1, sit: true, look: 1, smile: true }],
+  surf: [{ prop: "skate", phase: 0, ox: -1, oy: -1, armL: "up" }, { prop: "skate", phase: 1, ox: 1, armR: "up" }, { prop: "skate", phase: 0, ox: -1, oy: -1, armL: "up", armR: "up", smile: true }, { prop: "skate", phase: 1, ox: 1, blink: true }],
+  yoga: [{ armL: "up", armR: "up", oy: -1, blink: true }, { armL: "up", armR: "up", oy: -2, step: 1 }, { armL: "up", armR: "up", oy: -1, look: 1 }, { sit: true, blink: true, smile: true }],
+  taichi: [{ armL: "up", armR: "mid", look: -1 }, { armL: "up", armR: "up" }, { armR: "up", look: 1, oy: -1 }, { armR: "mid", look: 1 }, { armL: "up", blink: true }, { smile: true }],
+  campfire: [{ prop: "campfire", phase: 0, armR: "mid", smile: true }, { prop: "campfire", phase: 1, armR: "mid", blink: true }, { prop: "campfire", phase: 0, armL: "up", armR: "mid", look: 1 }, { prop: "campfire", phase: 1, smile: true }],
+  stargaze: [{ prop: "search", phase: 0, armR: "up", look: 1 }, { prop: "search", phase: 1, armR: "up", look: 1, blink: true }, { prop: "search", phase: 0, armR: "up", look: 1, oy: -1 }, { prop: "search", phase: 1, armR: "up", look: 1, smile: true }],
+  gardener: [{ prop: "flower", phase: 0, armR: "mid", look: 1 }, { prop: "flower", phase: 1, armR: "mid", smile: true }, { prop: "flower", phase: 0, blink: true }, { prop: "flower", phase: 1, armR: "up", smile: true }],
+  butterfly: [{ look: -1, armR: "up", oy: -1 }, { look: 1, oy: -2, armL: "up", armR: "up" }, { look: 1, oy: -1, armR: "up", sweat: true, phase: 1 }, { look: -1, blink: true, smile: true }],
+  sneeze: [{ blink: true, armL: "up" }, { oy: 1, blink: true, sweat: true, phase: 0 }, { oy: -1, armR: "up", confetti: 2 }, { blink: true, smile: true }],
+  selfie: [{ prop: "camera", phase: 1, armL: "up", armR: "up", look: -1, smile: true }, { prop: "camera", phase: 0, armL: "up", armR: "up", smile: true }, { prop: "camera", phase: 1, armL: "up", oy: -1, smile: true }, { prop: "camera", phase: 0, armL: "up", blink: true }],
+  beatbox: [{ prop: "mic", notes: 0, armL: "up", oy: -1 }, { prop: "mic", notes: 2, blink: true }, { prop: "mic", notes: 1, armL: "up", smile: true }, { prop: "mic", notes: 2, oy: -1, look: 1 }],
+  lullaby: [{ sit: true, zzz: 0, notes: 0, blink: true }, { sit: true, zzz: 1, notes: 1, blink: true }, { sit: true, zzz: 2, notes: 2, blink: true }, { sit: true, zzz: 1, notes: 1, blink: true }],
+  limbo: [{ sit: true, armL: "up", armR: "up", smile: true }, { sit: true, oy: 1, armL: "up", armR: "up", look: 1 }, { sit: true, armL: "up", armR: "up", sweat: true, phase: 0 }, { sit: true, oy: 1, armL: "up", armR: "up", blink: true }],
+  parade: [{ flag: 0, step: 0, confetti: 1, smile: true }, { flag: 1, step: 1, oy: -1 }, { flag: 2, step: 0, confetti: 3 }, { flag: 1, step: 1, oy: -1, blink: true }],
 } satisfies Record<string, Pose[]>;
 
 type RoutineName = keyof typeof ROUTINES;

@@ -290,6 +290,335 @@ const routines = {
       .to([pupL,pupR], { x:0, duration:.3 }, "<");
     return tl;
   },
+  // ── thirty more, mirroring the terminal routines ─────────────────────────
+  moonwalk() {
+    const tl = gsap.timeline();
+    tl.set(mascot, { rotation: -4, svgOrigin: "80 128" })
+      .to(legL, { scaleY: .7, duration: .16, yoyo: true, repeat: 5, ease: "sine.inOut" }, 0)
+      .to(legR, { scaleY: .7, duration: .16, yoyo: true, repeat: 5, ease: "sine.inOut" }, .08)
+      .to(mascot, { x: 42, duration: 1.05, ease: "none" }, 0)
+      .to([pupL, pupR], { x: -4, duration: .2 }, 0)
+      .to(mascot, { x: 0, rotation: 0, duration: .35, ease: "power2.inOut" })
+      .to([pupL, pupR], { x: 0, duration: .2 }, "<");
+    blink(tl, 1.2);
+    return tl;
+  },
+  robot() {
+    const tl = gsap.timeline({ defaults: { ease: "steps(1)", duration: .14 } });
+    tl.to(armL, { rotation: -90, transformOrigin: "50% 0%" }, 0)
+      .to(armR, { rotation: 90, transformOrigin: "50% 0%" }, .14)
+      .to(mascot, { rotation: 6, svgOrigin: "80 128" }, .28)
+      .to(armL, { rotation: 0 }, .42)
+      .to(mascot, { rotation: -6 }, .56)
+      .to(armR, { rotation: 0 }, .7)
+      .to(mascot, { rotation: 0 }, .84);
+    blink(tl, .45);
+    return tl;
+  },
+  salsa() {
+    const tl = gsap.timeline();
+    tl.to(mouth, { scaleX: 1.3, transformOrigin: "50% 50%", duration: .2 }, 0)
+      .to(mascot, { x: -12, rotation: -6, svgOrigin: "80 128", duration: .25, ease: "sine.inOut" }, 0)
+      .to(armL, { rotation: -120, transformOrigin: "50% 0%", duration: .25 }, 0)
+      .to(mascot, { x: 12, rotation: 6, duration: .25, ease: "sine.inOut" })
+      .to(armL, { rotation: 0, duration: .25 }, "<")
+      .to(armR, { rotation: 120, transformOrigin: "50% 0%", duration: .25 }, "<")
+      .to(mascot, { x: -12, rotation: -6, duration: .25, ease: "sine.inOut" })
+      .to(armR, { rotation: 0, duration: .25 }, "<")
+      .to(mascot, { x: 0, rotation: 0, duration: .25, ease: "sine.inOut" })
+      .to(mouth, { scaleX: 1, duration: .2 }, "<");
+    return tl;
+  },
+  headbang() {
+    const tl = gsap.timeline();
+    tl.to(armL, { rotation: -110, transformOrigin: "50% 0%", duration: .2 }, 0)
+      .to(body, { rotation: 10, svgOrigin: "80 60", duration: .12, yoyo: true, repeat: 5, ease: "power1.inOut" }, 0)
+      .to(mascot, { y: 4, duration: .12, yoyo: true, repeat: 5, ease: "sine.inOut" }, 0)
+      .to(body, { rotation: 0, duration: .15 })
+      .to(armL, { rotation: 0, duration: .2 }, "<");
+    return tl;
+  },
+  dj() {
+    const tl = gsap.timeline();
+    tl.to(mascot, { y: -6, duration: .2, yoyo: true, repeat: 5, ease: "sine.inOut" }, 0)
+      .to(armR, { rotation: -30, transformOrigin: "50% 0%", duration: .15, yoyo: true, repeat: 7, ease: "sine.inOut" }, 0)
+      .to(armL, { rotation: -80, transformOrigin: "50% 0%", duration: .3, yoyo: true, repeat: 1 }, .6)
+      .to([armL, armR], { rotation: 0, duration: .25 })
+      .to([pupL, pupR], { x: 3, duration: .2, yoyo: true, repeat: 1 }, 0);
+    return tl;
+  },
+  ballet() {
+    const tl = gsap.timeline();
+    tl.to([armL, armR], { rotation: (i) => i ? -140 : 140, transformOrigin: "50% 0%", duration: .35, ease: "power2.out" }, 0)
+      .to(mascot, { y: -24, rotation: 360, svgOrigin: "80 90", duration: .9, ease: "power1.inOut" }, .2)
+      .to(mascot, { y: 0, duration: .3, ease: "power2.in" })
+      .to(body, { scaleY: .88, transformOrigin: "50% 100%", duration: .1, yoyo: true, repeat: 1 }, "<")
+      .to([armL, armR], { rotation: 0, duration: .3 }, "<");
+    return tl;
+  },
+  hula() {
+    const tl = gsap.timeline();
+    tl.to([armL, armR], { rotation: (i) => i ? -70 : 70, transformOrigin: "50% 0%", duration: .3 }, 0)
+      .to(body, { x: -8, rotation: -5, svgOrigin: "80 60", duration: .22, ease: "sine.inOut" }, .1)
+      .to(body, { x: 8, rotation: 5, duration: .22, yoyo: true, repeat: 3, ease: "sine.inOut" })
+      .to(body, { x: 0, rotation: 0, duration: .2 })
+      .to([armL, armR], { rotation: 0, duration: .25 }, "<");
+    blink(tl, .6);
+    return tl;
+  },
+  disco() {
+    const tl = gsap.timeline();
+    tl.to(armR, { rotation: -130, transformOrigin: "50% 0%", duration: .2, ease: "back.out(2)" }, 0)
+      .to(mascot, { x: 10, rotation: 5, svgOrigin: "80 128", duration: .25, ease: "sine.inOut" }, 0)
+      .to(mascot, { y: -14, duration: .18, yoyo: true, repeat: 1 }, .25)
+      .to(armR, { rotation: -30, duration: .2 }, .45)
+      .to(armL, { rotation: 130, transformOrigin: "50% 0%", duration: .2, ease: "back.out(2)" }, .5)
+      .to(mascot, { x: -10, rotation: -5, duration: .25, ease: "sine.inOut" }, .5)
+      .to(mascot, { x: 0, rotation: 0, y: 0, duration: .25 })
+      .to([armL, armR], { rotation: 0, duration: .25 }, "<");
+    return tl;
+  },
+  drums() {
+    const tl = gsap.timeline();
+    tl.to(armL, { rotation: -50, transformOrigin: "50% 0%", duration: .1, yoyo: true, repeat: 5, ease: "power1.inOut" }, 0)
+      .to(armR, { rotation: 50, transformOrigin: "50% 0%", duration: .1, yoyo: true, repeat: 5, ease: "power1.inOut" }, .05)
+      .to(mascot, { y: -5, duration: .2, yoyo: true, repeat: 3, ease: "sine.inOut" }, 0)
+      .to([armL, armR], { rotation: 0, duration: .2 });
+    return tl;
+  },
+  sax() {
+    const tl = gsap.timeline();
+    tl.to(body, { scaleY: .92, transformOrigin: "50% 100%", duration: .3 }, 0)
+      .to(mascot, { rotation: -5, svgOrigin: "80 128", x: -6, duration: .35, ease: "sine.inOut" }, 0)
+      .to(mascot, { rotation: 5, x: 6, duration: .35, yoyo: true, repeat: 3, ease: "sine.inOut" })
+      .to([pupL, pupR], { x: 4, duration: .2 }, 0)
+      .to(mascot, { rotation: 0, x: 0, duration: .3 })
+      .to(body, { scaleY: 1, duration: .25 }, "<")
+      .to([pupL, pupR], { x: 0, duration: .2 }, "<");
+    return tl;
+  },
+  violin() {
+    const tl = gsap.timeline();
+    tl.to(armR, { rotation: -60, transformOrigin: "50% 0%", duration: .18, yoyo: true, repeat: 7, ease: "sine.inOut" }, 0)
+      .to(body, { rotation: -3, svgOrigin: "80 128", duration: .4, yoyo: true, repeat: 1, ease: "sine.inOut" }, 0)
+      .to([pupL, pupR], { x: -4, duration: .25 }, 0)
+      .to(armR, { rotation: 0, duration: .2 })
+      .to([pupL, pupR], { x: 0, duration: .2 }, "<");
+    blink(tl, .9);
+    return tl;
+  },
+  conductor() {
+    const tl = gsap.timeline();
+    tl.to([armL, armR], { rotation: (i) => i ? -110 : 110, transformOrigin: "50% 0%", duration: .3 }, 0)
+      .to(armR, { rotation: -70, duration: .2, yoyo: true, repeat: 5, ease: "sine.inOut" }, .3)
+      .to(armL, { rotation: 70, duration: .4, yoyo: true, repeat: 1, ease: "sine.inOut" }, .5)
+      .to(mascot, { rotation: 3, svgOrigin: "80 128", duration: .4, yoyo: true, repeat: 1 }, .4)
+      .to([armL, armR], { rotation: 0, duration: .3 });
+    return tl;
+  },
+  tennis() {
+    const tl = gsap.timeline();
+    tl.to(mascot, { x: 14, duration: .2, ease: "power2.in" }, 0)
+      .to(armR, { rotation: -100, transformOrigin: "50% 0%", duration: .15, ease: "power3.out" }, .15)
+      .to(mascot, { y: -16, duration: .2, yoyo: true, repeat: 1, ease: "sine.out" }, .2)
+      .to(armR, { rotation: 30, duration: .18 }, .35)
+      .to(mascot, { x: 0, duration: .35, ease: "power2.out" }, .6)
+      .to(armR, { rotation: 0, duration: .25 }, "<");
+    return tl;
+  },
+  dunk() {
+    const tl = gsap.timeline();
+    tl.to(body, { scaleY: .8, y: 10, transformOrigin: "50% 100%", duration: .14, ease: "power3.in" })
+      .to(mascot, { y: -85, duration: .4, ease: "sine.out" })
+      .to(body, { scaleY: 1.1, y: 0, duration: .4 }, "<")
+      .to([armL, armR], { rotation: (i) => i ? -150 : 150, transformOrigin: "50% 0%", duration: .3 }, "<")
+      .to(mascot, { y: 0, duration: .28, ease: "power3.in" })
+      .to(body, { scaleY: .82, duration: .1, yoyo: true, repeat: 1, ease: "power2.inOut" }, "<")
+      .to([armL, armR], { rotation: 0, duration: .25 })
+      .to(body, { scaleY: 1, duration: .15 }, "<");
+    return tl;
+  },
+  soccer() {
+    const tl = gsap.timeline();
+    tl.to(mascot, { x: -8, duration: .15, ease: "power2.in" }, 0)
+      .to(legR, { rotation: -35, transformOrigin: "50% 0%", duration: .12, ease: "power3.out" }, .1)
+      .to(legR, { rotation: 0, duration: .2 }, .25)
+      .to(mascot, { x: 6, y: -8, duration: .2, yoyo: true, repeat: 1, ease: "sine.out" }, .3)
+      .to(mascot, { x: 0, duration: .3, ease: "power2.out" });
+    blink(tl, .5);
+    return tl;
+  },
+  boxing() {
+    const tl = gsap.timeline();
+    tl.to(mascot, { x: -6, rotation: -3, svgOrigin: "80 128", duration: .15, ease: "sine.inOut" }, 0)
+      .to(armR, { rotation: -85, transformOrigin: "50% 0%", duration: .1, ease: "power4.out" }, .1)
+      .to(armR, { rotation: 0, duration: .15 }, .22)
+      .to(mascot, { x: 6, rotation: 3, duration: .15, ease: "sine.inOut" }, .3)
+      .to(armL, { rotation: 85, transformOrigin: "50% 0%", duration: .1, ease: "power4.out" }, .4)
+      .to(armL, { rotation: 0, duration: .15 }, .52)
+      .to(mascot, { x: 0, rotation: 0, duration: .25 });
+    return tl;
+  },
+  kayak() {
+    const tl = gsap.timeline();
+    tl.to(body, { scaleY: .85, y: 8, transformOrigin: "50% 100%", duration: .25 }, 0)
+      .to(armL, { rotation: -40, transformOrigin: "50% 0%", duration: .3, yoyo: true, repeat: 3, ease: "sine.inOut" }, .1)
+      .to(armR, { rotation: 40, transformOrigin: "50% 0%", duration: .3, yoyo: true, repeat: 3, ease: "sine.inOut" }, .25)
+      .to(mascot, { rotation: 4, svgOrigin: "80 128", duration: .3, yoyo: true, repeat: 3, ease: "sine.inOut" }, .1)
+      .to(body, { scaleY: 1, y: 0, duration: .25 })
+      .to([armL, armR], { rotation: 0, duration: .25 }, "<");
+    return tl;
+  },
+  surf() {
+    const tl = gsap.timeline();
+    tl.to(body, { scaleY: .9, transformOrigin: "50% 100%", duration: .3 }, 0)
+      .to([armL, armR], { rotation: (i) => i ? -80 : 80, transformOrigin: "50% 0%", duration: .3 }, 0)
+      .to(mascot, { x: -18, rotation: -7, svgOrigin: "80 128", duration: .4, ease: "sine.inOut" }, .1)
+      .to(mascot, { x: 18, rotation: 7, duration: .4, ease: "sine.inOut" })
+      .to(mascot, { x: 0, rotation: 0, duration: .35, ease: "sine.inOut" })
+      .to(body, { scaleY: 1, duration: .25 }, "<")
+      .to([armL, armR], { rotation: 0, duration: .25 }, "<");
+    return tl;
+  },
+  yoga() {
+    const tl = gsap.timeline();
+    tl.to([armL, armR], { rotation: (i) => i ? -150 : 150, transformOrigin: "50% 0%", duration: .7, ease: "sine.inOut" }, 0)
+      .to(mascot, { y: -14, duration: .7, ease: "sine.inOut" }, 0)
+      .to(shadow, { scaleX: .85, opacity: .25, transformOrigin: "50% 50%", duration: .7 }, 0)
+      .to({}, { duration: .5 })
+      .to(mascot, { y: 0, duration: .6, ease: "sine.inOut" })
+      .to(shadow, { scaleX: 1, opacity: .35, duration: .6 }, "<")
+      .to([armL, armR], { rotation: 0, duration: .6 }, "<");
+    blink(tl, 1.1);
+    return tl;
+  },
+  taichi() {
+    const tl = gsap.timeline();
+    tl.to(mascot, { x: -10, rotation: -3, svgOrigin: "80 128", duration: .8, ease: "sine.inOut" }, 0)
+      .to(armL, { rotation: -70, transformOrigin: "50% 0%", duration: .8, ease: "sine.inOut" }, 0)
+      .to(armR, { rotation: 20, transformOrigin: "50% 0%", duration: .8, ease: "sine.inOut" }, 0)
+      .to(mascot, { x: 10, rotation: 3, duration: .8, ease: "sine.inOut" })
+      .to(armL, { rotation: -20, duration: .8, ease: "sine.inOut" }, "<")
+      .to(armR, { rotation: 70, duration: .8, ease: "sine.inOut" }, "<")
+      .to(mascot, { x: 0, rotation: 0, duration: .7, ease: "sine.inOut" })
+      .to([armL, armR], { rotation: 0, duration: .7, ease: "sine.inOut" }, "<");
+    return tl;
+  },
+  campfire() {
+    const tl = gsap.timeline();
+    tl.to(body, { scaleY: .82, y: 10, transformOrigin: "50% 100%", duration: .35 }, 0)
+      .to([armL, armR], { rotation: (i) => i ? -35 : 35, transformOrigin: "50% 0%", duration: .35 }, 0)
+      .to(mouth, { scaleX: 1.3, transformOrigin: "50% 50%", duration: .3 }, .2)
+      .to(mascot, { rotation: 2, svgOrigin: "80 128", duration: .8, yoyo: true, repeat: 1, ease: "sine.inOut" }, .3)
+      .to(body, { scaleY: 1, y: 0, duration: .3 })
+      .to([armL, armR], { rotation: 0, duration: .3 }, "<")
+      .to(mouth, { scaleX: 1, duration: .25 }, "<");
+    blink(tl, .7);
+    return tl;
+  },
+  stargaze() {
+    const tl = gsap.timeline();
+    tl.to(body, { rotation: -8, svgOrigin: "80 128", duration: .4, ease: "power2.out" }, 0)
+      .to([pupL, pupR], { y: -4, x: 2, duration: .3 }, 0)
+      .to(think, { opacity: 1, duration: .3 }, .4)
+      .fromTo(think.children, { opacity: .2 }, { opacity: 1, stagger: .25, duration: .3, yoyo: true, repeat: 1 }, .4)
+      .to(think, { opacity: 0, duration: .3 })
+      .to(body, { rotation: 0, duration: .35 }, "<")
+      .to([pupL, pupR], { y: 0, x: 0, duration: .3 }, "<");
+    return tl;
+  },
+  gardener() {
+    const tl = gsap.timeline();
+    tl.to(body, { scaleY: .78, y: 14, transformOrigin: "50% 100%", duration: .3, ease: "power2.out" }, 0)
+      .to(armR, { rotation: 30, transformOrigin: "50% 0%", duration: .25, yoyo: true, repeat: 3, ease: "sine.inOut" }, .2)
+      .to([pupL, pupR], { x: 4, y: 3, duration: .25 }, .1)
+      .to(body, { scaleY: 1, y: 0, duration: .35, ease: "back.out(1.5)" })
+      .to(armR, { rotation: 0, duration: .25 }, "<")
+      .to([pupL, pupR], { x: 0, y: 0, duration: .25 }, "<");
+    blink(tl, .9);
+    return tl;
+  },
+  butterfly() {
+    const tl = gsap.timeline();
+    tl.to([pupL, pupR], { x: -4, y: -3, duration: .2 }, 0)
+      .to(mascot, { x: -16, y: -18, duration: .25, ease: "sine.out" }, .1)
+      .to(armR, { rotation: -120, transformOrigin: "50% 0%", duration: .2 }, .1)
+      .to([pupL, pupR], { x: 4, duration: .2 }, .35)
+      .to(mascot, { x: 16, y: -22, duration: .3, ease: "sine.inOut" }, .35)
+      .to(armL, { rotation: 120, transformOrigin: "50% 0%", duration: .2 }, .45)
+      .to(mascot, { x: 0, y: 0, duration: .35, ease: "power2.inOut" })
+      .to([armL, armR], { rotation: 0, duration: .25 }, "<")
+      .to([pupL, pupR], { x: 0, y: 0, duration: .2 }, "<");
+    return tl;
+  },
+  sneeze() {
+    const tl = gsap.timeline();
+    tl.to(body, { scaleY: .85, y: 8, transformOrigin: "50% 100%", duration: .4, ease: "power2.inOut" }, 0)
+      .to([eyeL, eyeR], { scaleY: .15, transformOrigin: "50% 50%", duration: .3 }, .1)
+      .to(mascot, { y: -14, rotation: 4, svgOrigin: "80 128", duration: .12, ease: "power4.out" }, .45)
+      .to(mouth, { scaleX: 1.6, scaleY: 2, transformOrigin: "50% 50%", duration: .1 }, .45)
+      .to(mascot, { y: 0, rotation: 0, duration: .25, ease: "bounce.out" }, .6)
+      .to(body, { scaleY: 1, y: 0, duration: .2 }, .6)
+      .to(mouth, { scaleX: 1, scaleY: 1, duration: .2 }, .8)
+      .to([eyeL, eyeR], { scaleY: 1, duration: .25 }, .9);
+    return tl;
+  },
+  selfie() {
+    const tl = gsap.timeline();
+    tl.to(armR, { rotation: -140, transformOrigin: "50% 0%", duration: .3, ease: "back.out(1.5)" }, 0)
+      .to(body, { rotation: -5, svgOrigin: "80 128", duration: .3 }, 0)
+      .to(mouth, { scaleX: 1.5, transformOrigin: "50% 50%", duration: .2 }, .2)
+      .to(mascot, { y: -6, duration: .15, yoyo: true, repeat: 1 }, .5)
+      .to([eyeL, eyeR], { scaleY: .1, transformOrigin: "50% 50%", duration: .05, yoyo: true, repeat: 1 }, .65)
+      .to(armR, { rotation: 0, duration: .3 })
+      .to(body, { rotation: 0, duration: .3 }, "<")
+      .to(mouth, { scaleX: 1, duration: .2 }, "<");
+    return tl;
+  },
+  beatbox() {
+    const tl = gsap.timeline();
+    tl.to(armL, { rotation: -100, transformOrigin: "50% 0%", duration: .25 }, 0)
+      .to(mouth, { scaleY: 2.2, scaleX: 1.3, transformOrigin: "50% 50%", duration: .1, yoyo: true, repeat: 7, ease: "power1.inOut" }, .1)
+      .to(mascot, { y: -5, duration: .1, yoyo: true, repeat: 7, ease: "sine.inOut" }, .1)
+      .to(armL, { rotation: 0, duration: .25 })
+      .to(mouth, { scaleX: 1, scaleY: 1, duration: .15 }, "<");
+    return tl;
+  },
+  lullaby() {
+    const tl = gsap.timeline();
+    tl.to(body, { scaleY: .88, y: 8, transformOrigin: "50% 100%", duration: .5 }, 0)
+      .to([eyeL, eyeR], { scaleY: .3, transformOrigin: "50% 50%", duration: .5 }, 0)
+      .to(mascot, { rotation: 3, svgOrigin: "80 128", duration: .7, yoyo: true, repeat: 1, ease: "sine.inOut" }, .2)
+      .to(zzz, { opacity: 1, duration: .3 }, .5)
+      .to(zzz, { opacity: 0, duration: .3 }, 1.2)
+      .to(body, { scaleY: 1, y: 0, duration: .4 })
+      .to([eyeL, eyeR], { scaleY: 1, duration: .4 }, "<");
+    return tl;
+  },
+  limbo() {
+    const tl = gsap.timeline();
+    tl.to([armL, armR], { rotation: (i) => i ? -120 : 120, transformOrigin: "50% 0%", duration: .3 }, 0)
+      .to(mascot, { rotation: -16, svgOrigin: "80 128", duration: .4, ease: "power2.out" }, .1)
+      .to(mascot, { x: 22, duration: .7, ease: "none" }, .4)
+      .to([pupL, pupR], { y: -3, duration: .25 }, .3)
+      .to(mascot, { rotation: 0, duration: .3, ease: "back.out(2)" }, 1.15)
+      .to(mascot, { x: 0, duration: .35, ease: "power2.inOut" }, 1.2)
+      .to([armL, armR], { rotation: 0, duration: .3 }, 1.25)
+      .to([pupL, pupR], { y: 0, duration: .2 }, 1.3);
+    return tl;
+  },
+  parade() {
+    const tl = gsap.timeline();
+    tl.to(legL, { scaleY: .72, duration: .14, yoyo: true, repeat: 7, ease: "sine.inOut" }, 0)
+      .to(legR, { scaleY: .72, duration: .14, yoyo: true, repeat: 7, ease: "sine.inOut" }, .07)
+      .to(armL, { rotation: -30, transformOrigin: "50% 0%", duration: .14, yoyo: true, repeat: 7 }, 0)
+      .to(armR, { rotation: 30, transformOrigin: "50% 0%", duration: .14, yoyo: true, repeat: 7 }, .07)
+      .to(mascot, { x: 26, duration: 1.1, ease: "none" }, 0)
+      .to(mouth, { scaleX: 1.3, transformOrigin: "50% 50%", duration: .2 }, .2)
+      .to(mascot, { x: 0, duration: .3, ease: "power2.inOut" })
+      .to(mouth, { scaleX: 1, duration: .2 }, "<");
+    return tl;
+  },
 };
 
 const names = Object.keys(routines);
