@@ -12,12 +12,13 @@ If we're honest, a lot of us now spend more of the day watching Pi think than ty
 - **Stable terminal layout** — every frame stays inside a fixed five-row canvas and is width-truncated before rendering, so jump/peek/shake frames cannot wrap and push the editor or footer around.
 - **Effort reactions** — changing effort immediately plays a distinct animation for every level: sleep (`off`), coffee (`minimal`), walk (`low`), typing (`medium`), think (`high`), rocket (`xhigh`), and magic (`max`).
 - **Context reactions** — the mascot starts searching at 50%, reads at 70%, panics at 85%, and tries to rocket out at 95%. Crossing each threshold triggers the reaction immediately.
-- **A random color in every window** — each new Pi window gets its own mascot color from 18 presets (pin one with `PI_MASCOT_COLOR` if you want consistency). You can also choose a preset or any `#RRGGBB` color yourself, pick a one-off random color, or let the mascot occasionally change itself.
+- **A random color in every window** — each new Pi window gets its own mascot color from 30 presets (pin one with `PI_MASCOT_COLOR` if you want consistency). You can also choose a preset or any `#RRGGBB` color yourself, pick a one-off random color, or let the mascot occasionally change itself.
 - **A "Hello NAME" greeting** in big block letters when you open a fresh session, cleared the moment you send your first message.
 - **An effort meter** — a live bar of your current thinking level (`off → max`), colored from the active theme.
 - **A context bar** — how full your context window is, right now, as a bar plus a percentage. Cyan when you're fine, amber past 70%, red past 85%.
 - **A compaction counter** — how many times the session has auto-compacted, so you know when the conversation is getting long and it might be time to start fresh.
 - **A quiet activity slot** — the otherwise-empty right side shows only one timely signal (`◉ 3 agents`, `↻ compacting`, `↳ follow-up queued`, or a brief success/failure). It stays completely blank when nothing needs attention. Subagent counts come from the current session's live run status, not a guess.
+- **Multi-π modes** — `/doublepi` toggles a second π dancing in sync next to the first (with its own color, refreshed every routine), and `/ultracrazy` puts three πs on stage at once, each doing a different routine while all three change color every few hundred milliseconds.
 - **Work-aware reactions** — searches use the magnifying glass, edits type, writes paint, test runs peek and then cheer/panic, and subagent fan-outs wave the director flag. The animation carries secondary information without adding another dashboard row.
 - **Smart, model-aware auto-compaction** — compaction that triggers at a percentage of *whatever model you're on*, instead of a fixed token count that means different things on a 200k vs a 1M window.
 - **A synthwave theme** to tie it together.
@@ -68,7 +69,7 @@ export PI_MASCOT_NAME=Ada
 | Command | What it does |
 |---------|--------------|
 | `/mascot` | Toggle the greeting + mascot on/off |
-| `/mascot-color purple` | Set a preset: blue, cyan, pink, purple, green, orange, red, gold, white, lime, teal, indigo, coral, sky, mint, rose, magenta, or ice |
+| `/mascot-color purple` | Set a preset: blue, cyan, pink, purple, green, orange, red, gold, white, lime, teal, indigo, coral, sky, mint, rose, magenta, ice, peach, lavender, aqua, emerald, ruby, amber, plum, orchid, lemon, pumpkin, forest, or ocean |
 | `/mascot-color #7c3aed` | Set any custom hex color |
 | `/mascot-color random` | Pick a different color once |
 | `/mascot-color auto` | Enable occasional automatic color changes |
@@ -76,6 +77,8 @@ export PI_MASCOT_NAME=Ada
 | `/mascot-auto-color [on\|off]` | Toggle automatic color changes, or set them explicitly |
 | `/dance` | Dance marathon: the mascot performs all 218 routines once, in order (~6 min) |
 | `/crazy` | Crazy mode: the same marathon at 2× frame speed with a new random color every ~0.3s (~3 min), ending in confetti |
+| `/doublepi` | Toggle a second π mascot dancing in sync (its color refreshes every routine) |
+| `/ultracrazy` | Three πs at once, each on its own routine, all recoloring rapidly (~1 min, ending in confetti) |
 | `/fx` | Toggle the custom footer (dir · branch · ctx% · cost · model) |
 | `/compact-at 85` | Set the auto-compaction threshold to any percent (10–99) |
 

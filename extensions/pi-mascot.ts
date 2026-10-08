@@ -13,6 +13,8 @@
  *   /mascot-auto-color [on|off] toggle occasional color changes
  *   /dance                     dance marathon: every routine once, in order
  *   /crazy                     dance marathon, but faster with rapid color changes
+ *   /doublepi                  toggle a second π dancing in sync
+ *   /ultracrazy                three πs at once, different routines, colors flying
  */
 
 import * as fs from "node:fs";
@@ -46,6 +48,18 @@ const COLOR_PRESETS: Record<string, MascotColor> = {
   rose: { body: "251;113;133", shadow: "181;81;96" },
   magenta: { body: "232;80;220", shadow: "170;55;160" },
   ice: { body: "180;220;255", shadow: "130;160;190" },
+  peach: { body: "255;178;132", shadow: "184;128;95" },
+  lavender: { body: "196;165;255", shadow: "141;119;184" },
+  aqua: { body: "64;224;208", shadow: "46;161;150" },
+  emerald: { body: "16;185;129", shadow: "12;133;93" },
+  ruby: { body: "224;17;95", shadow: "161;12;68" },
+  amber: { body: "255;191;0", shadow: "184;138;0" },
+  plum: { body: "221;160;221", shadow: "159;115;159" },
+  orchid: { body: "218;112;214", shadow: "157;81;154" },
+  lemon: { body: "250;237;85", shadow: "180;171;61" },
+  pumpkin: { body: "255;117;24", shadow: "184;84;17" },
+  forest: { body: "46;160;67", shadow: "33;115;48" },
+  ocean: { body: "24;144;216", shadow: "17;104;156" },
 };
 const COLOR_NAMES = Object.keys(COLOR_PRESETS);
 
@@ -244,6 +258,10 @@ function frame(p: Pose = {}, color: MascotColor): string[] {
 
   return render(g.map((r) => r.join("")), color);
 }
+
+// Side-by-side canvases for /doublepi and /ultracrazy (same five rows).
+const joinArts = (arts: string[][]): string[] =>
+  [0, 1, 2, 3, 4].map((row) => arts.map((a) => a[row] ?? "").join("   "));
 
 // Original twelve + fourteen prop routines + eight more + thirty new + 154 more = 218 total.
 const ROUTINES = {
@@ -565,6 +583,10 @@ export default function (pi: ExtensionAPI) {
   let colorName = "blue";
   let mascotColor = COLOR_PRESETS.blue;
   let party: { crazy: boolean; remaining: number; nextSwitchAt: number; nextColorAt: number } | undefined;
+  let ultra: { remaining: number; nextSwitchAt: number; nextColorAt: number; triple: RoutineName[] } | undefined;
+  let ultraColors: string[] = [];
+  let doublePi = false;
+  let doubleColor = "pink";
   let autoColor = /^(1|true|on)$/i.test(process.env.PI_MASCOT_AUTO_COLOR ?? "");
   let nextColorAt = 0;
   let compactingUntil = 0;
@@ -597,7 +619,7 @@ export default function (pi: ExtensionAPI) {
     nextFrameAt = 0;
   };
   const force = (name: RoutineName, durationMs: number) => {
-    if (party) return; // the dance marathon owns the stage until it ends
+    if (party || ultra) return; // a marathon owns the stage until it ends
     activate(name);
     forcedUntil = Date.now() + durationMs;
   };
@@ -619,6 +641,20 @@ export default function (pi: ExtensionAPI) {
   const scheduleColor = (now: number) => {
     const min = working ? 8_000 : 20_000, spread = working ? 10_000 : 20_000;
     nextColorAt = now + min + Math.random() * spread;
+  };
+
+  const pickDistinctColors = (n: number): string[] => {
+    const pool = COLOR_NAMES.filter((name) => name !== colorName);
+    const out: string[] = [];
+    while (out.length < n && pool.length > 0) out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]!);
+    return out;
+  };
+  const startUltra = () => {
+    party = undefined;
+    ultra = { remaining: NAMES.length, nextSwitchAt: 0, nextColorAt: 0, triple: NAMES.slice(0, 3) };
+    ultraColors = pickDistinctColors(3);
+    forcedUntil = 0;
+    tick();
   };
 
   const flashActivity = (text: string, token: ActivityToken, durationMs: number) => {
@@ -703,9 +739,20 @@ export default function (pi: ExtensionAPI) {
 
   const paint = (ctx: ExtensionContext) => {
     const theme = (ctx.ui as unknown as { theme: Theme }).theme;
-    const poses = routine === "idle" ? IDLE : ROUTINES[routine];
-    const pose = poses[frameIndex++ % poses.length];
-    const art = frame({ ...pose, look: pose.look ?? ctxLook(ctx) }, mascotColor);
+    let art: string[];
+    if (ultra) {
+      art = joinArts(ultra.triple.map((name, i) => {
+        const up = ROUTINES[name] ?? IDLE;
+        const upose = up[frameIndex % up.length] ?? {};
+        return frame({ ...upose, look: upose.look ?? ctxLook(ctx) }, COLOR_PRESETS[ultraColors[i] ?? "blue"] ?? mascotColor);
+      }));
+      frameIndex++;
+    } else {
+      const poses = routine === "idle" ? IDLE : ROUTINES[routine];
+      const pose = poses[frameIndex++ % poses.length];
+      const single = frame({ ...pose, look: pose.look ?? ctxLook(ctx) }, mascotColor);
+      art = doublePi ? joinArts([single, frame({ ...pose, look: pose.look ?? ctxLook(ctx) }, COLOR_PRESETS[doubleColor] ?? mascotColor)]) : single;
+    }
     const status = statusLines(theme, ctx, compactions);
     const activity = activityBadge(theme, ctx, Date.now());
     stableWidget(ctx, art.map((row, i) => {
@@ -732,7 +779,24 @@ export default function (pi: ExtensionAPI) {
       scheduleColor(now);
     }
 
-    if (party) {
+    if (ultra) {
+      if (now >= ultra.nextSwitchAt) {
+        if (ultra.remaining <= 0) {
+          ultra = undefined;
+          activate(contextRoutine(pct));
+          force("confetti", 1_600);
+        } else {
+          const base = NAMES.length - ultra.remaining;
+          ultra.triple = [0, 1, 2].map((i) => NAMES[(base + i) % NAMES.length] ?? "dance");
+          ultra.remaining -= 3;
+          ultra.nextSwitchAt = now + 800;
+        }
+      }
+      if (ultra && now >= ultra.nextColorAt) {
+        ultraColors = pickDistinctColors(3);
+        ultra.nextColorAt = now + 250 + Math.random() * 300;
+      }
+    } else if (party) {
       if (now >= party.nextSwitchAt) {
         if (party.remaining <= 0) {
           const wasCrazy = party.crazy;
@@ -755,6 +819,7 @@ export default function (pi: ExtensionAPI) {
         if (now >= nextWorkRoutineAt) {
           activate(randomWorkRoutine());
           nextWorkRoutineAt = now + 3_500 + Math.random() * 2_500;
+          if (doublePi) doubleColor = pickDistinctColors(1)[0] ?? "pink"; // partner gets a fresh color each new routine
         }
       } else {
         const wanted = contextRoutine(pct);
@@ -764,7 +829,7 @@ export default function (pi: ExtensionAPI) {
 
     if (now < nextFrameAt) return;
     paint(ctx);
-    nextFrameAt = now + (routine === "idle" ? 1_200 : party?.crazy ? 90 : 160);
+    nextFrameAt = now + (routine === "idle" ? 1_200 : party?.crazy || ultra ? 90 : 160);
   };
 
   const startLoop = (ctx: ExtensionContext) => {
@@ -792,6 +857,9 @@ export default function (pi: ExtensionAPI) {
     compactingUntil = 0;
     activityFlash = undefined;
     party = undefined;
+    ultra = undefined;
+    ultraColors = [];
+    doublePi = false;
     subagentToolActive = false;
     liveSubagent = undefined;
     nextSubagentReadAt = 0;
@@ -960,6 +1028,35 @@ export default function (pi: ExtensionAPI) {
       }
       startParty(true);
       ctx.ui.notify("🤪 CRAZY MODE", "info");
+    },
+  });
+
+  pi.registerCommand("doublepi", {
+    description: "Toggle a second π mascot dancing in sync alongside the first",
+    handler: async (_args, ctx) => {
+      currentCtx = ctx;
+      if (!enabled) {
+        ctx.ui.notify("mascot is off — toggle it back on with /mascot", "warning");
+        return;
+      }
+      doublePi = !doublePi;
+      if (doublePi) doubleColor = pickDistinctColors(1)[0] ?? "pink";
+      nextFrameAt = 0;
+      tick();
+      ctx.ui.notify(doublePi ? "ππ double pi — dancing together" : "back to one π", "info");
+    },
+  });
+
+  pi.registerCommand("ultracrazy", {
+    description: "Ultra crazy: three πs at once, each on its own routine, colors flying",
+    handler: async (_args, ctx) => {
+      currentCtx = ctx;
+      if (!enabled) {
+        ctx.ui.notify("mascot is off — toggle it back on with /mascot", "warning");
+        return;
+      }
+      startUltra();
+      ctx.ui.notify("🤪🤪🤪 ULTRA CRAZY — three πs at once", "info");
     },
   });
 
